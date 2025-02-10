@@ -1,0 +1,17 @@
+services:
+ app:
+   build: 
+    context: .
+    args:
+      - DEV=true
+   container_name: recipe-app
+   ports:
+     - "8000:8000"
+   environment:
+     DJANGO_SECRET_KEY: ${DJANGO_SECRET_KEY}
+     DEBUG: ${DEBUG}
+     DJANGO_ALLOWED_HOSTS: ${DJANGO_ALLOWED_HOSTS}
+   volumes:
+     - ./app:/app
+   env_file:
+     - .env
