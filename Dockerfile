@@ -14,7 +14,15 @@ ARG DEV=false
  
 # Upgrade pip
 RUN pip install --upgrade pip 
- 
+
+# Install system packages needed to compile psycopg2 from source
+# - build-essential provides gcc, g++ and other compiling tools
+# - libpq-dev are the PostgreSQL client development headers (needed by psycopg2)
+RUN apt-get update && apt-get install -y \
+    build-essential \
+    libpq-dev \
+    && rm -rf /var/lib/apt/lists/*
+
 # Copy the Django project  and install dependencies
 COPY requirements.txt  /tmp/requirements.txt
 COPY requirements.dev.txt /tmp/requirements.dev.txt

@@ -1,17 +1,38 @@
 services:
- app:
-   build: 
-    context: .
-    args:
-      - DEV=true
-   container_name: recipe-app
-   ports:
-     - "8000:8000"
-   environment:
-     DJANGO_SECRET_KEY: ${DJANGO_SECRET_KEY}
-     DEBUG: ${DEBUG}
-     DJANGO_ALLOWED_HOSTS: ${DJANGO_ALLOWED_HOSTS}
-   volumes:
-     - ./app:/app
-   env_file:
-     - .env
+  app:
+    build: 
+      context: .
+      args:
+        - DEV=true
+    container_name: recipe-app
+    ports:
+      - "8000:8000"
+    environment:
+      DJANGO_SECRET_KEY: ${DJANGO_SECRET_KEY}
+      DEBUG: ${DEBUG}
+      DJANGO_ALLOWED_HOSTS: ${DJANGO_ALLOWED_HOSTS}
+      DB_HOST: ${POSTGRES_HOST}
+      DB_NAME: ${POSTGRES_DB}
+      DB_USER: ${POSTGRES_USER}
+      DB_PASS: ${POSTGRES_PASSWORD}
+    volumes:
+      - ./app:/app
+    env_file:
+      - .env
+    depends_on:
+      - db
+  db:
+    image: postgres:14-alpine
+    volumes:
+      - dev-db-data:/var/lib/postgresql/data
+    ports:
+      - "5432:5432"
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB}
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+    env_file:
+      - .env
+
+volumes:
+  dev-db-data:
