@@ -16,7 +16,7 @@ class UserModelTests(TestCase):
         And if they are set correctly
         """
         password = 'testPass123'
-        email = 'test@email.test'
+        email = 'test-req-fields@email.test'
         name = 'Test Name'
 
         user = self.UserModel.objects.create_user(email=email, password=password, name=name)
@@ -41,7 +41,7 @@ class UserModelTests(TestCase):
         Users email must be valid, if not it must raise an ValidationError
         """
         password = 'testPass123'
-        invalid_emails = ['', ' ', None, 'invalid_email.com']
+        invalid_emails = ['', ' ', None, 'invalid_email.com', 'invalidEmail.com']
 
         for invalid_email in invalid_emails:
             with self.assertRaises(ValidationError):
@@ -51,8 +51,8 @@ class UserModelTests(TestCase):
         """
         Tests if UserProfile model normalizes email
         """
-        email = 'test@Email.TesT'
-        normalized_email = 'test@email.test'
+        email = 'test-normal@Email.TesT'
+        normalized_email = 'test-normal@email.test'
         password = 'testPass123'
 
         user = self.UserModel.objects.create_user(email=email, password=password)
@@ -65,7 +65,7 @@ class UserModelTests(TestCase):
         """
         password = 'testPass123'
         password2 = 'testPass675'
-        email = 'test@email.test'
+        email = 'test-same@email.test'
 
         self.UserModel.objects.create_user(email=email, password=password)
         with self.assertRaises(Exception):
@@ -76,7 +76,7 @@ class UserModelTests(TestCase):
         Superuser must be created a User with property is_staff equals True
         """
         password = 'testPass123'
-        email = 'test@email.test'
+        email = 'test-super@email.test'
         name = 'Test Name'
 
         superuser = self.UserModel.objects.create_superuser(email=email, password=password, name=name)
