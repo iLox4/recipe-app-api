@@ -1,15 +1,17 @@
 """
 Test for models
 """
+from decimal import Decimal
+
 from django.test import TestCase
 from django.core.exceptions import ValidationError
 # We could import model directly, but it is a better practice to import it like this
 from django.contrib.auth import get_user_model
 
+from core import models
+
 
 class UserModelTests(TestCase):
-    UserModel = get_user_model()
-
     def test_user_has_all_fields(self):
         """
         Tests if UserProfile model has fields: name, email, is_staff, is_active
@@ -19,7 +21,7 @@ class UserModelTests(TestCase):
         email = 'test-req-fields@email.test'
         name = 'Test Name'
 
-        user = self.UserModel.objects.create_user(email=email, password=password, name=name)
+        user = get_user_model().objects.create_user(email=email, password=password, name=name)
 
         self.assertEqual(user.name, name)
         self.assertTrue(user.check_password(password))
@@ -34,7 +36,7 @@ class UserModelTests(TestCase):
         password = 'testPass123'
         name = 'Test Name'
         with self.assertRaises(Exception):
-            self.UserModel.objects.create_user(password=password, name=name)
+            get_user_model().objects.create_user(password=password, name=name)
 
     def test_user_email_must_be_valid(self):
         """
@@ -45,7 +47,7 @@ class UserModelTests(TestCase):
 
         for invalid_email in invalid_emails:
             with self.assertRaises(ValidationError):
-                self.UserModel.objects.create_user(email=invalid_email, password=password)
+                get_user_model().objects.create_user(email=invalid_email, password=password)
 
     def test_user_has_normalized_email(self):
         """
@@ -55,7 +57,7 @@ class UserModelTests(TestCase):
         normalized_email = 'test-normal@email.test'
         password = 'testPass123'
 
-        user = self.UserModel.objects.create_user(email=email, password=password)
+        user = get_user_model().objects.create_user(email=email, password=password)
 
         self.assertEqual(user.email, normalized_email)
 
@@ -67,9 +69,9 @@ class UserModelTests(TestCase):
         password2 = 'testPass675'
         email = 'test-same@email.test'
 
-        self.UserModel.objects.create_user(email=email, password=password)
+        get_user_model().objects.create_user(email=email, password=password)
         with self.assertRaises(Exception):
-            self.UserModel.objects.create_user(email=email, password=password2)
+            get_user_model().objects.create_user(email=email, password=password2)
 
     def test_create_superuser_successfuly(self):
         """
@@ -79,7 +81,7 @@ class UserModelTests(TestCase):
         email = 'test-super@email.test'
         name = 'Test Name'
 
-        superuser = self.UserModel.objects.create_superuser(email=email, password=password, name=name)
+        superuser = get_user_model().objects.create_superuser(email=email, password=password, name=name)
 
         self.assertEqual(superuser.name, name)
         self.assertTrue(superuser.check_password(password))
@@ -88,5 +90,22 @@ class UserModelTests(TestCase):
         self.assertIs(superuser.is_staff, True)
         self.assertIs(superuser.is_superuser, True)
 
+
+class RecipeModelTests(TestCase):
+    def test_create_recipe(self):
+        """Test creating a recipe is successful"""
+        user = get_user_model().objects.create_user(
+            email='user@test.test',
+            password='testpass123'
+        )
+        recipe = models.Recipe.objects.create(
+            user=user,
+            title='Sample recipe name',
+            time_minutes=5,
+            price=Decimal('5.50'),
+            description='Sample recipe description'
+        )
+
+        self.assertEqual(str(recipe), recipe.title)
 
 

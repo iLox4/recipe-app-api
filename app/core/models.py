@@ -1,6 +1,7 @@
 from django.db import models
 from django.contrib.auth.models import AbstractBaseUser, PermissionsMixin, BaseUserManager
 from django.core.validators import validate_email
+from django.conf import settings
 
 
 class UserManager(BaseUserManager):
@@ -43,3 +44,20 @@ class User(AbstractBaseUser, PermissionsMixin):
     def __str__(self) -> str:
         """Return string representation of user"""
         return self.email
+
+
+class Recipe(models.Model):
+    """Recipe model"""
+    title = models.CharField(max_length=255)
+    time_minutes = models.IntegerField()
+    price = models.DecimalField(max_digits=5, decimal_places=2)
+    description = models.TextField(blank=True)
+    link = models.CharField(max_length=255, blank=True)
+    user = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.CASCADE
+    )
+
+    def __str__(self) -> str:
+        """Return string representation of recipe"""
+        return self.title
