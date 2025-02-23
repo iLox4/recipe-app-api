@@ -1,4 +1,4 @@
-from rest_framework.mixins import ListModelMixin
+from rest_framework.mixins import ListModelMixin, UpdateModelMixin, DestroyModelMixin
 from rest_framework.viewsets import ModelViewSet, GenericViewSet
 from rest_framework.authentication import TokenAuthentication
 from rest_framework.permissions import IsAuthenticated
@@ -27,7 +27,7 @@ class RecipeViewSet(ModelViewSet):
         serializer.save(user=self.request.user)
 
 
-class TagViewSet(ListModelMixin, GenericViewSet):
+class TagViewSet(DestroyModelMixin, UpdateModelMixin, ListModelMixin, GenericViewSet):
     """Manage tags in the database"""
     serializer_class = TagSerializer
     queryset = Tag.objects.all()
