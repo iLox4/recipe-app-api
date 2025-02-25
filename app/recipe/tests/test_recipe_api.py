@@ -167,4 +167,38 @@ class PrivateRecipeAPITests(TestCase):
         exists = Tag.objects.filter(user=tag_breakfast.user, name=tag_breakfast.name).exists()
         self.assertTrue(exists)
 
+    def test_create_tag_on_update(self):
+        """Test creating tag when updating a recipe"""
+        recipe = create_recipe(user=self.user)
+
+        payload = {
+            'tags': [{'name': 'Thai'}]
+        }
+        res = self.client.patch(detail_url(recipe.id), payload, format='json')
+
+        self.assertEqual(res.status_code, status.HTTP_200_OK)
+
+        for tag in payload['tags']:
+            new_tag = Tag.objects.get(name=tag['name'], user=self.user)
+            self.assertIsNotNone(new_tag)
+            # We do not need to refresh if we are using recipe.tags.all()
+            # because we set the relation as many to many =>
+            # when we call it, it would perform a new query
+            # so it must get all new tags
+            self.assertIn(new_tag, recipe.tags.all())
+
+    def test_assign_tag_on_update(self):
+        """Test assigning tag when updating a recipe"""
+        recipe = create_recipe(user=self.user)
+        tag = Tag.objects.create(user=self.user, name='Fast')
+
+        payload = {
+            'tags': [{'name': 'Fast'}]
+        }
+        res = self.client.patch(detail_url(recipe.id), payload, format='json')
+
+        self.assertEqual(res.status_code, status.HTTP_200_OK)
+        self.assertIsNotNone(Tag.objects.get(id=tag.id))
+        self.assertIn(tag, recipe.tags.all())
+
 
