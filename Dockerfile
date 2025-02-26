@@ -1,19 +1,19 @@
 # Use the official Python runtime image
-FROM python:3.13  
+FROM python:3.13
 
 # Set the working directory inside the container
 WORKDIR /app
- 
-# Set environment variables 
+
+# Set environment variables
 # Prevents Python from writing pyc files to disk
 ENV PYTHONDONTWRITEBYTECODE=1
 # Prevents Python from buffering stdout and stderr
 ENV PYTHONUNBUFFERED=1
 # Set a default argument value
-ARG DEV=false 
- 
+ARG DEV=false
+
 # Upgrade pip
-RUN pip install --upgrade pip 
+RUN pip install --upgrade pip
 
 # Install system packages needed to compile psycopg2 from source
 # - build-essential provides gcc, g++ and other compiling tools
@@ -21,6 +21,8 @@ RUN pip install --upgrade pip
 RUN apt-get update && apt-get install -y \
     build-essential \
     libpq-dev \
+    zlib1g-dev \
+    libjpeg-dev \
     && rm -rf /var/lib/apt/lists/*
 
 # Copy the Django project  and install dependencies
@@ -43,11 +45,17 @@ COPY ./app /app
 # Add user to not use root user
 RUN adduser --disabled-password --no-create-home django-user
 
+# Creating directories for static files
+RUN mkdir -p /vol/web/media && \
+    mkdir -p /vol/web/static && \
+    chown -R django-user:django-user /vol && \
+    chmod -R 755 /vol
+
 # Set user to newly created user
 USER django-user
- 
+
 # Expose the Django port
 EXPOSE 8000
- 
+
 # Run Django’s development server
 CMD ["python", "manage.py", "runserver", "0.0.0.0:8000"]
