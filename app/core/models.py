@@ -58,10 +58,12 @@ class Recipe(models.Model):
         on_delete=models.CASCADE
     )
     tags = models.ManyToManyField('Tag')
+    ingredients = models.ManyToManyField('Ingredient')
 
     def __str__(self) -> str:
         """Return string representation of recipe"""
         return self.title
+
 
 class Tag(models.Model):
     """Tag for filtering recipes"""
@@ -73,4 +75,17 @@ class Tag(models.Model):
 
     def __str__(self):
         """Returns a string representation of the tag"""
+        return self.name
+
+
+class Ingredient(models.Model):
+    """Ingredient for recipes"""
+    name = models.CharField(max_length=255)
+    user = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.CASCADE
+    )
+
+    def __str__(self):
+        """Returns a string represintation of the ingredient"""
         return self.name
