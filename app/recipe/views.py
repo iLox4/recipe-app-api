@@ -27,9 +27,8 @@ class RecipeViewSet(ModelViewSet):
         serializer.save(user=self.request.user)
 
 
-class RecipePropsViewSet(DestroyModelMixin, UpdateModelMixin, ListModelMixin, GenericViewSet):
-    """Manage recipe properties in the database"""
-    serializer_class = None
+class BaseRecipeAttrViewSet(DestroyModelMixin, UpdateModelMixin, ListModelMixin, GenericViewSet):
+    """Manage recipe attributes in the database"""
     queryset = []
     authentication_classes = [TokenAuthentication]
     permission_classes = [IsAuthenticated]
@@ -39,13 +38,13 @@ class RecipePropsViewSet(DestroyModelMixin, UpdateModelMixin, ListModelMixin, Ge
         return self.queryset.filter(user=self.request.user).order_by('-name')
 
 
-class TagViewSet(RecipePropsViewSet):
+class TagViewSet(BaseRecipeAttrViewSet):
     """Manage tags in the database"""
     serializer_class = TagSerializer
     queryset = Tag.objects.all()
 
 
-class IngredientViewSet(RecipePropsViewSet):
+class IngredientViewSet(BaseRecipeAttrViewSet):
     """Manage ingredients in database"""
     serializer_class = IngredientSerializer
     queryset = Ingredient.objects.all()
